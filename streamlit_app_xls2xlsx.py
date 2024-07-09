@@ -81,7 +81,9 @@ if ss.btn_state:
             df_list[i].to_excel(file_names[i] + '.xlsx')
 
     elif type_option == 'xls':
-        xls_to_xlsx(dirname)
+        for i in range(len(files)):   
+            df_list[i] = pd.read_excel( files[i])
+            df_list[i].to_excel(file_names[i] + '.xlsx')
     st.write("⚠️如果显示'TypeError: This COM object ... process...'，关闭进程中的excel重试 ")
     if st.checkbox('数据合并'):        
         files = glob.glob(dirname + "*.xlsx")
