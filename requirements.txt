@@ -1,5 +1,4 @@
 pandas
-io 
 pyxlsb
 itertools
 tkinter
