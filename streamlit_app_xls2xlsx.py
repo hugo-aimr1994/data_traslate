@@ -4,14 +4,9 @@ import pandas as pd
 from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
 import itertools
-import tkinter as tk
-from tkinter import filedialog
 import glob
 import os
 import os.path
-import matplotlib
-
-matplotlib.use('Agg')
 
 #mpl.font_manager.fontManager.addfont('./SimHei.ttf') #临时注册新的全局字体
 #plt.rcParams['font.sans-serif'] = ['SimHei'] # 步骤一（替换sans-serif字体）
@@ -45,44 +40,30 @@ def to_excel(df):
     writer.save()
     processed_data = output.getvalue()
     return processed_data
-#%load_ext streamlit
-#@st.cache(allow_output_mutation=True)
+
 st.title("格式转换")
 #添加文件上传功能
-#uploaded_datafile = st.file_uploader("🟦上传原始数据文件",type=["xlsx","csv"])
-type_option = st.selectbox('✅输入文件格式',('csv','xls'))
-st.write('🟦文件格式:', type_option)
+uploaded_datafile = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"])
 
-root = tk.Tk()
-root.withdraw()
- 
-# Make folder picker dialog appear on top of other windows
-root.wm_attributes('-topmost', 1)
-
-st.write('请选择文件夹:')
-clicked = st.button('Folder Picker')
-if 'btn_state' not in ss:ss.btn_state = False
-if clicked:
-    ss.btn_state = True
-
-if ss.btn_state:
-    dirname = st.text_input('🟦选择文件夹:', filedialog.askdirectory(master=root))
-    st.write('🟦文件夹路径:', dirname)
-    
-
+if uploaded_datafile is not None:
+    # 获取文件路径
+    file_path = os.path.abspath(uploaded_file.name)
+    # 获取文件夹路径
+    dirname = os.path.dirname(file_path)
+    st.write('🟦文件夹路径:', dirname)    
+    type_option = file_path[-3:]
+    st.write('🟦文件格式:', type_option)
     #file_name = uploaded_datafile.name
     files = glob.glob(dirname + "*." + type_option)
     file_names = [file[0:-4] for file in files]
-    if type_option == 'csv':
-        #dfa = pd.read_csv(files[0], low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
-        df_list = ['df' + str(i) for i in range(len(files))]
-
+    df_list = ['df' + str(i) for i in range(len(files))]
+    if file_path.endswith('.csv'):
         for i in range(len(files)):    
             #df_list[i] = pd.read_csv(files[i], low_memory=False,encoding = 'gbk')
             df_list[i] = pd.read_csv( files[i], low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
             df_list[i].to_excel(file_names[i] + '.xlsx')
 
-    elif type_option == 'xls':
+    if file_path.endswith('.xls'):
         for i in range(len(files)):   
             df_list[i] = pd.read_excel( files[i])
             df_list[i].to_excel(file_names[i] + '.xlsx')
