@@ -9,6 +9,9 @@ from tkinter import filedialog
 import glob
 import os
 import os.path
+import matplotlib
+
+matplotlib.use('Agg')
 
 #mpl.font_manager.fontManager.addfont('./SimHei.ttf') #临时注册新的全局字体
 #plt.rcParams['font.sans-serif'] = ['SimHei'] # 步骤一（替换sans-serif字体）
