@@ -45,7 +45,7 @@ st.title("格式转换")
 #添加文件上传功能
 uploaded_file = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"])
 
-if uploaded_datafile is not None:
+if uploaded_file is not None:
     # 获取文件路径
     file_path = os.path.abspath(uploaded_file.name)
     # 获取文件夹路径
