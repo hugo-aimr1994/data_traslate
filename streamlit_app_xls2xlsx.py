@@ -9,8 +9,7 @@ from tkinter import filedialog
 import glob
 import os
 import os.path
-import win32com.client as win32
-import time
+
 #mpl.font_manager.fontManager.addfont('./SimHei.ttf') #临时注册新的全局字体
 #plt.rcParams['font.sans-serif'] = ['SimHei'] # 步骤一（替换sans-serif字体）
 #plt.rcParams['axes.unicode_minus'] = False
