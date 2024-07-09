@@ -1,5 +1,3 @@
 pandas
 pyxlsb
-os
 win32com
-time
