@@ -1,3 +1,2 @@
 pandas
 pyxlsb
-win32com
