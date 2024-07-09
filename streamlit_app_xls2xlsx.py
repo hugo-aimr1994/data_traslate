@@ -43,27 +43,36 @@ def to_excel(df):
 
 st.title("格式转换")
 #添加文件上传功能
-uploaded_file = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"])
-
-if uploaded_file is not None:
+#uploaded_file = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"])
+#st.write('🟦文件路径:', uploaded_file.name)
+# 用户输入文件路径
+file_path = st.text_input('请输入文件路径，如D:\python:')
+#file_path = file_path.replace("\","//")
+type_option = st.selectbox('✅需转换文件类型',('xls','csv'))
+# 检查文件是否存在
+if file_path and os.path.exists(file_path):
+#if uploaded_file is not None:
     # 获取文件路径
-    file_path = os.path.abspath(uploaded_file.name)
+    #file_path = os.path.abspath(os.path.join(uploaded_file.name))
+    
+    #st.write('🟦文件路径:', file_path) 
     # 获取文件夹路径
-    dirname = os.path.dirname(file_path)
+    dirname = file_path.replace('\\','/') + '/'
     st.write('🟦文件夹路径:', dirname)    
-    type_option = file_path[-3:]
+    #type_option = file_path[-3:]
     st.write('🟦文件格式:', type_option)
     #file_name = uploaded_datafile.name
     files = glob.glob(dirname + "*." + type_option)
+    st.write('🟦导入文件：',files)
     file_names = [file[0:-4] for file in files]
     df_list = ['df' + str(i) for i in range(len(files))]
-    if file_path.endswith('.csv'):
+    if type_option.lower()=='csv':
         for i in range(len(files)):    
             #df_list[i] = pd.read_csv(files[i], low_memory=False,encoding = 'gbk')
             df_list[i] = pd.read_csv( files[i], low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
             df_list[i].to_excel(file_names[i] + '.xlsx')
 
-    if file_path.endswith('.xls'):
+    if type_option.lower()=='xls':
         for i in range(len(files)):   
             df_list[i] = pd.read_excel( files[i])
             df_list[i].to_excel(file_names[i] + '.xlsx')
