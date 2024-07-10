@@ -6,4 +6,5 @@ urllib3   ==                 1.23
 pandas
 pyxlsb
 openpyxl
-xlsxwriter 
+xlrd       ==                1.2.0
+XlsxWriter  ==               3.1.9
