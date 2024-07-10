@@ -6,28 +6,15 @@ from pyxlsb import open_workbook as open_xlsb
 import itertools
 import glob
 import os
-import os.path
-
-#mpl.font_manager.fontManager.addfont('./SimHei.ttf') #临时注册新的全局字体
-#plt.rcParams['font.sans-serif'] = ['SimHei'] # 步骤一（替换sans-serif字体）
-#plt.rcParams['axes.unicode_minus'] = False
-#plt.rcParams['font.size'] = 18  #设置字体大小，全局有效
-def xls_to_xlsx(rootdir):
-    # 三个参数：父目录；所有文件夹名（不含路径）；所有文件名
-    for parent, dirnames, filenames in os.walk(rootdir):
-        for fn in filenames:
-            filedir = os.path.join(parent, fn)
-            print(filedir)
-
-            excel = win32.gencache.EnsureDispatch('Excel.Application')
-            wb = excel.Workbooks.Open(filedir)
-            # xlsx: FileFormat=51
-            # xls:  FileFormat=56,
-            # 后缀名的大小写不通配，需按实际修改：xls，或XLS            
-            wb.SaveAs(filedir.replace('xls', 'xlsx').replace('XLS', 'xlsx').replace('/', '\\'), FileFormat=51)            
-            wb.Close()            
-            excel.Application.Quit()
-            
+import os.path           
+# 将DataFrame压缩成一个zip文件
+def dataframe_to_zip(df, filename):
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, 'w') as zip_file:
+        zip_file.writestr(f"{filename}.csv", df.to_csv(index=False))
+    zip_file_bytes = buffer.getvalue()
+    buffer.close()
+    return zip_file_bytes
 
 def to_excel(df):
     output = BytesIO()
@@ -43,46 +30,37 @@ def to_excel(df):
 
 st.title("格式转换")
 #添加文件上传功能
-#uploaded_file = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"])
-#st.write('🟦文件路径:', uploaded_file.name)
-# 用户输入文件路径
-file_path = st.text_input('请输入文件路径，如D:\python:')
-#file_path = file_path.replace("\","//")
-type_option = st.selectbox('✅需转换文件类型',('xls','csv'))
-# 检查文件是否存在
-if file_path and os.path.exists(file_path):
-#if uploaded_file is not None:
-    # 获取文件路径
-    #file_path = os.path.abspath(os.path.join(uploaded_file.name))
-    
-    #st.write('🟦文件路径:', file_path) 
-    # 获取文件夹路径
-    dirname = file_path.replace('\\','/') + '/'
-    st.write('🟦文件夹路径:', dirname)    
-    #type_option = file_path[-3:]
-    st.write('🟦文件格式:', type_option)
-    #file_name = uploaded_datafile.name
-    files = glob.glob(dirname + "*." + type_option)
-    st.write('🟦导入文件：',files)
-    file_names = [file[0:-4] for file in files]
-    df_list = ['df' + str(i) for i in range(len(files))]
-    if type_option.lower()=='csv':
-        for i in range(len(files)):    
-            #df_list[i] = pd.read_csv(files[i], low_memory=False,encoding = 'gbk')
-            df_list[i] = pd.read_csv( files[i], low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
-            df_list[i].to_excel(file_names[i] + '.xlsx')
+uploaded_files = st.file_uploader("🟦上传原始数据文件",type=["xls","csv"], accept_multiple_files=True)
 
-    if type_option.lower()=='xls':
-        for i in range(len(files)):   
-            df_list[i] = pd.read_excel( files[i])
-            df_list[i].to_excel(file_names[i] + '.xlsx')
+type_option = st.selectbox('✅需转换文件类型',('xls','csv'))
+df_list = ['df' + str(i) for i in range(len(uploaded_files))]
+if uploaded_files is not None:
+
+    
+    for i in range(len(uploaded_files)):
+        file=uploaded_files[i]
+        file_path = os.path.abspath(file.name)
+        fordle_path = os.path.dirname(file_path)
+        st.write("file_path",fordle_path)
+        st.write(f"File name: {file.name}")
+        type_option = file.name[-3:]
+        if type_option.lower()=='csv':
+            df_list[i] = pd.read_csv( file, low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
+            df_list[i].to_excel(fordle_path + '\\' + file.name[0:-3] + '.xlsx')
+
+        if type_option.lower()=='xls':
+
+            df_list[i] = pd.read_excel( file)
+            df_list[i].to_excel(fordle_path + '\\' +file.name[0:-3] + '.xlsx')
+    
     st.write("⚠️如果显示'TypeError: This COM object ... process...'，关闭进程中的excel重试 ")
+        
     if st.checkbox('数据合并'):        
-        files = glob.glob(dirname + "*.xlsx")
+        #files = glob.glob(dirname + "*.xlsx")
         st.write('🟦合并结果：')
-        df_list = ['df' + str(i) for i in range(len(files))]
-        for i in range(len(files)):    
-            df_list[i] = pd.read_excel(files[i])
+        #df_list = ['df' + str(i) for i in range(len(files))]
+        #for i in range(len(files)):    
+            #df_list[i] = pd.read_excel(files[i])
         dfa_result = pd.concat(df_list,keys = files)    
         df_xlsx = to_excel(dfa_result)
         st.download_button(label='📥 下载合并结果',
