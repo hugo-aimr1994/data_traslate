@@ -46,12 +46,21 @@ if uploaded_files is not None:
         type_option = file.name[-3:]
         if type_option.lower()=='csv':
             df_list[i] = pd.read_csv( file, low_memory=False,encoding = 'utf-8',encoding_errors='ignore')
-            df_list[i].to_excel(fordle_path + '\\' + file.name[0:-3] + '.xlsx')
+            #df_list[i].to_excel(fordle_path + '\\' + file.name[0:-3] + '.xlsx')
+            df_xlsx = to_excel(df_list[i])
+            st.download_button(label='📥 下载结果',
+                                    data=df_xlsx ,
+                                    file_name= file.name[0:-4] + '.xlsx')
+
 
         if type_option.lower()=='xls':
 
             df_list[i] = pd.read_excel( file)
-            df_list[i].to_excel(fordle_path + '\\' +file.name[0:-3] + '.xlsx')
+            #df_list[i].to_excel(fordle_path + '\\' +file.name[0:-3] + '.xlsx')
+            df_xlsx = to_excel(df_list[i])
+            st.download_button(label='📥 下载结果',
+                                    data=df_xlsx ,
+                                    file_name= file.name[0:-4] + '.xlsx')
     
     st.write("⚠️如果显示'TypeError: This COM object ... process...'，关闭进程中的excel重试 ")
         
