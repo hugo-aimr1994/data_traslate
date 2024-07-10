@@ -17,15 +17,11 @@ def dataframe_to_zip(df, filename):
     return zip_file_bytes
 
 def to_excel(df):
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name='Sheet1')
-    workbook = writer.book
-    worksheet = writer.sheets['Sheet1']
-    format1 = workbook.add_format({'num_format': '0.00'}) 
-    worksheet.set_column('A:A', None, format1)  
-    writer.save()
-    processed_data = output.getvalue()
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine="openpyxl")
+    df.to_excel(writer,index=False,sheet_name="result")
+    writer.close()
+    processed_data=output.getvalue()
     return processed_data
 
 st.title("格式转换")
